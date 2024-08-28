@@ -54,8 +54,19 @@ def main():
     # Display the model coefficients
     st.subheader("General model coefficients")
     st.write(f"Price = \\${model.intercept_:.2f} + \\${model.coef_[0]:.2f} per mile + \\${model.coef_[1]:.2f} per minute")
-    st.subheader(f"Area models coefficients:")
-    st.write(f"Coming soon with more data!")
+    st.subheader(f"Area models coefficients")
+    st.write(f"_Coming soon with more data!_")
+
+    # Scatter plots for distance vs. price and duration vs. price
+    st.subheader("Scatter plots")
+
+    col1, col2 = st.columns(2)
+
+    with col1:
+        st.scatter_chart(df, x='Distance', y='Price', color='Area')
+
+    with col2:
+        st.scatter_chart(df, x='Duration_minutes', y='Price', color='Area')
 
     # Input form for price prediction
     st.subheader("Predict Price")
