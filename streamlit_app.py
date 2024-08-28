@@ -25,7 +25,7 @@ def main():
     df['Duration_minutes'] = df['Duration'].dt.total_seconds() / 60
 
     # Perform multiple linear regression
-    X1 = df[['Duration_minutes', 'Distance']]
+    X1 = df[['Distance', 'Duration_minutes']]
     y1 = df['Price']
     model = LinearRegression()
     model.fit(X1, y1)
@@ -34,7 +34,7 @@ def main():
     area_list = df['Area'].unique()
     city_models = {}
     for area in area_list:
-        X_area = df[df['Area'] == area][['Duration_minutes', 'Distance']]
+        X_area = df[df['Area'] == area][['Distance', 'Duration_minutes']]
         y_area = df[df['Area'] == area]['Price']
         model_area = LinearRegression()
         model_area.fit(X_area, y_area)
@@ -55,7 +55,8 @@ def main():
     st.subheader("General model coefficients")
     st.write(f"Price = \\${model.intercept_:.2f} + \\${model.coef_[0]:.2f} per mile + \\${model.coef_[1]:.2f} per minute")
     st.subheader(f"Area models coefficients")
-    st.write(f"_Coming soon with more data!_")
+    st.write(f"Los Angeles: Price = \\${city_models['Los Angeles'].intercept_:.2f} + \\${city_models['Los Angeles'].coef_[0]:.2f} per mile + \\${city_models['Los Angeles'].coef_[1]:.2f} per minute")
+    st.write(f"_San Fransisco and Phoenix models are coming when more data is available_")
 
     # Scatter plots for distance vs. price and duration vs. price
     st.subheader("Scatter plots")
@@ -70,19 +71,17 @@ def main():
 
     # Input form for price prediction
     st.subheader("Predict Price")
-    with st.form("input_form"):
-        duration_input = st.number_input("Enter duration in minutes:", min_value=0.0, value=30.0)
-        distance_input = st.number_input("Enter distance in miles:", min_value=0.0, value=5.0)
-        city_input = st.selectbox("Select area:", options=["Los Angeles", "San Francisco", "Phoenix"])
-        submit_button = st.form_submit_button("Predict Price")
+    distance_input = st.slider("Select distance in miles:", min_value=0.0, max_value=20.0, value=6.0, step=0.25)
+    duration_input = st.slider("Select duration in minutes:", min_value=0, max_value=90, value=30, step=1)
 
-        if submit_button:
-            gen_prediction = model.predict([[duration_input, distance_input]])[0]
-            if city_input:
-                city_prediction = city_models[city_input].predict([[duration_input, distance_input]])[0]
 
-            st.write(f"Predicted general price: \\${gen_prediction:.2f}")
-            st.write(f"Predicted price for {city_input}: \\${city_prediction:.2f}")
+    city_input = st.selectbox("Select area:", options=["Los Angeles", "San Francisco", "Phoenix"])
+
+    gen_prediction = model.predict([[distance_input, duration_input]])[0]
+    city_prediction = city_models[city_input].predict([[distance_input, duration_input]])[0]
+
+    st.write(f"Predicted general price: \\${gen_prediction:.2f}")
+    st.write(f"Predicted price for {city_input}: \\${city_prediction:.2f}")
 
 if __name__ == "__main__":
     main()
