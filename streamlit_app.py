@@ -29,16 +29,19 @@ def main():
     y1 = df['Price']
     model = LinearRegression()
     model.fit(X1, y1)
+    r2 = model.score(X1, y1)
 
     # Create a model for each city
     area_list = df['Area'].unique()
     city_models = {}
+    city_r2 = {}
     for area in area_list:
         X_area = df[df['Area'] == area][['Distance', 'Duration_minutes']]
         y_area = df[df['Area'] == area]['Price']
         model_area = LinearRegression()
         model_area.fit(X_area, y_area)
         city_models[area] = model_area
+        city_r2[area] = model_area.score(X_area, y_area)
 
 
     ### STREAMLIT APP ###
@@ -53,9 +56,9 @@ def main():
 
     # Display the model coefficients
     st.subheader("General model coefficients")
-    st.write(f"Price = \\${model.intercept_:.2f} + \\${model.coef_[0]:.2f} per mile + \\${model.coef_[1]:.2f} per minute")
+    st.write(f"Price = \\${model.intercept_:.2f} + \\${model.coef_[0]:.2f} per mile + \\${model.coef_[1]:.2f} per minute (R² = {r2:.2f})")
     st.subheader(f"Area models coefficients")
-    st.write(f"Los Angeles: Price = \\${city_models['Los Angeles'].intercept_:.2f} + \\${city_models['Los Angeles'].coef_[0]:.2f} per mile + \\${city_models['Los Angeles'].coef_[1]:.2f} per minute")
+    st.write(f"Los Angeles: Price = \\${city_models['Los Angeles'].intercept_:.2f} + \\${city_models['Los Angeles'].coef_[0]:.2f} per mile + \\${city_models['Los Angeles'].coef_[1]:.2f} per minute (R² = {city_r2['Los Angeles']:.2f})")
     st.write(f"_San Fransisco and Phoenix models are coming when more data is available_")
 
     # Scatter plots for distance vs. price and duration vs. price
