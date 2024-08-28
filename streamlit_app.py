@@ -44,6 +44,9 @@ def main():
 
     ### STREAMLIT APP ###
     st.title("🚗 Waymo Price Tracker 💰")
+    st.write("_An open-source, open-data price tracker for Waymo one rides._")
+    st.markdown("- Submit your rides: https://forms.gle/SAakkvWg5FB2tzLc6\n"
+                "- Git repo: https://github.com/EwoutH/Waymo-pricing")
 
     # Display raw data table
     st.subheader("Raw data")
