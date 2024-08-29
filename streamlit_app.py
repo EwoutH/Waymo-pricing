@@ -1,6 +1,27 @@
 import streamlit as st
 from sklearn.linear_model import LinearRegression
 import pandas as pd
+import numpy as np
+from scipy.optimize import curve_fit
+from scipy import stats
+import altair as alt
+
+
+
+def prediction_interval(x, y, degree, minX, maxY, confidence=0.95):
+    p, cov = np.polyfit(x, y, degree, cov=True)
+    y_model = np.polyval(p, x)
+    n = len(y)
+    m = p.size
+    dof = n - m
+    t = stats.t.ppf(1 - (1 - confidence) / 2., dof)
+    resid = y - y_model
+    chi2 = np.sum((resid / np.std(resid))**2)
+    s_err = np.sqrt(np.sum(resid**2) / dof)
+    x2 = np.linspace(minX, maxY, 100)
+    y2 = np.polyval(p, x2)
+    ci = t * s_err * np.sqrt(1 + 1/n + (x2 - np.mean(x))**2 / np.sum((x - np.mean(x))**2))
+    return x2, y2, y2 - ci, y2 + ci
 
 
 def main():
@@ -74,6 +95,71 @@ def main():
 
     with col2:
         st.scatter_chart(df, x='Duration_minutes', y='Price', color='Area')
+
+    st.subheader("24h Price Fluctuation")
+    all_city_data = pd.DataFrame()
+
+    for city in df['Area'].unique():
+        df_city = df[df['Area'] == city]
+        df_city['Price per Distance'] = df_city['Price'] / df_city['Distance']
+        df_city['Hour'] = df_city['Timestamp'].dt.hour
+        df_city['Area'] = city
+        all_city_data = pd.concat([all_city_data, df_city], ignore_index=True)
+
+    # Remove outliers
+    all_city_data_filtered = all_city_data[(np.abs(stats.zscore(all_city_data['Price per Distance'])) < 3)]
+
+    # Extend data to include hours above and below
+    data_22_to_24 = all_city_data_filtered[all_city_data_filtered['Hour'] >= 22].copy()
+    data_22_to_24['Hour'] = data_22_to_24['Hour'] - 24
+    data_0_to_2 = all_city_data_filtered[all_city_data_filtered['Hour'] <= 2].copy()
+    data_0_to_2['Hour'] = data_0_to_2['Hour'] + 24
+    all_city_data_extended = pd.concat([data_22_to_24, all_city_data_filtered, data_0_to_2], ignore_index=True)
+
+    # Polynomial fit order
+    poly_fit_order = 7
+    coefficients = np.polyfit(all_city_data_extended['Hour'], all_city_data_extended['Price per Distance'], poly_fit_order)
+    polynomial = np.poly1d(coefficients)
+
+    x_curve = np.linspace(0, 24, 100)
+    y_curve = polynomial(x_curve)
+
+    # Calculate 95% confidence interval
+    x2, y2, lower, upper = prediction_interval(all_city_data_extended['Hour'], all_city_data_extended['Price per Distance'], poly_fit_order, 0, 24)
+
+    curve_data = pd.DataFrame({
+        "Hour": x_curve,
+        "Price per Distance": y_curve,
+        "Type": "Fitted Curve"
+    })
+    prediction_interval_data = pd.DataFrame({
+        "Hour": x2,
+        "Lower Bound": lower,
+        "Upper Bound": upper
+    })
+
+    prediction_interval_curve = alt.Chart(prediction_interval_data).mark_area(opacity=0.3).encode(
+        x='Hour',
+        y='Lower Bound',
+        y2='Upper Bound',
+        color=alt.value('lightgrey')
+    )
+    scatter = alt.Chart(all_city_data).mark_point(filled=True).encode(
+        x=alt.X('Hour:Q', title='Hour'),
+        y=alt.Y('Price per Distance:Q', title='Price per Distance'),
+        color=alt.Color('Area:N', legend=alt.Legend(orient='bottom'))
+    )
+    line = alt.Chart(curve_data).mark_line().encode(
+        x='Hour',
+        y='Price per Distance',
+        color=alt.value('green')
+    )
+
+    # Combine the charts
+    chart = scatter + line + prediction_interval_curve
+    chart = chart.configure_axisX(grid=False) 
+
+    st.altair_chart(chart, use_container_width=True)
 
     # Input form for price prediction
     st.subheader("Predict Price")
