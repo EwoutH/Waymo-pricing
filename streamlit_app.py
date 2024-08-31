@@ -59,10 +59,10 @@ def main():
     st.write(f"Price = \\${model.intercept_:.2f} + \\${model.coef_[0]:.2f} per mile + \\${model.coef_[1]:.2f} per minute (R² = {r2:.2f})")
     st.subheader(f"Area models coefficients")
     reg_string = ""
-    for area in ["Los Angeles"]:  # area_list:
+    for area in area_list:
         reg_string += f"- {area}: Price = \\${city_models[area].intercept_:.2f} + \\${city_models[area].coef_[0]:.2f} per mile + \\${city_models[area].coef_[1]:.2f} per minute (R² = {city_r2[area]:.2f})\n"
     st.write(reg_string)
-    st.write(f"_San Francisco and Phoenix model coefficients are coming when more data is available_")
+    # st.write(f"_San Francisco and Phoenix model coefficients are coming when more data is available_")
 
     # Scatter plots for distance vs. price and duration vs. price
     st.subheader("Scatter plots")
