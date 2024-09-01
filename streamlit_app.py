@@ -93,8 +93,8 @@ def main():
     gen_prediction = model.predict([[distance_input, duration_input]])[0]
     city_prediction = city_models[city_input].predict([[distance_input, duration_input]])[0]
 
-    st.write(f"Predicted general price: \\${gen_prediction:.2f}")
-    st.write(f"Predicted price for {city_input}: \\${city_prediction:.2f}")
+    st.markdown(f"Predicted general price: \\$ **{gen_prediction:.2f}**")
+    st.markdown(f"Predicted price for {city_input}: \\$ **{city_prediction:.2f}**")
 
     # Histograms for Travel Distance, Travel Time, and Price
     st.subheader("Travel distance, travel time, and price histograms")
