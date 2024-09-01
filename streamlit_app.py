@@ -98,22 +98,22 @@ def main():
 
     # Histograms for Travel Distance, Travel Time, and Price
     st.subheader("Travel Distance, Travel Time, and Price Distributions")
-    
+
     col1, col2, col3 = st.columns(3)
 
-    # Binning the data
-    df['Distance_bin'] = pd.cut(df['Distance'], bins=range(0, 26, 1))
-    df['Duration_bin'] = pd.cut(df['Duration_minutes'], bins=range(0, 95, 5))
-    df['Price_bin'] = pd.cut(df['Price'], bins=[i * 2.5 for i in range(33)])
+    # Binning the data and converting to string for better label display
+    df['Distance_bin'] = pd.cut(df['Distance'], bins=range(0, 26, 1)).astype(str)
+    df['Duration_bin'] = pd.cut(df['Duration_minutes'], bins=range(0, 95, 5)).astype(str)
+    df['Price_bin'] = pd.cut(df['Price'], bins=[i * 2.5 for i in range(33)]).astype(str)
 
     with col1:
-        st.bar_chart(df['Distance_bin'].value_counts().sort_index())
+        st.bar_chart(df['Distance_bin'].value_counts().sort_index(), x_label='Distance (miles)')
 
     with col2:
-        st.bar_chart(df['Duration_bin'].value_counts().sort_index())
+        st.bar_chart(df['Duration_bin'].value_counts().sort_index(), x_label='Duration (minutes)')
 
     with col3:
-        st.bar_chart(df['Price_bin'].value_counts().sort_index())
+        st.bar_chart(df['Price_bin'].value_counts().sort_index(), x_label='Price ($)')
 
     # Add two histograms: Price per day of the week and Price per hour of the day
     # Extract day of the week and hour of the day from the Timestamp
