@@ -96,6 +96,25 @@ def main():
     st.write(f"Predicted general price: \\${gen_prediction:.2f}")
     st.write(f"Predicted price for {city_input}: \\${city_prediction:.2f}")
 
+    # Histograms for Travel Distance, Travel Time, and Price
+    st.subheader("Travel Distance, Travel Time, and Price Distributions")
+    
+    col1, col2, col3 = st.columns(3)
+
+    # Binning the data
+    df['Distance_bin'] = pd.cut(df['Distance'], bins=range(0, 26, 1))
+    df['Duration_bin'] = pd.cut(df['Duration_minutes'], bins=range(0, 95, 5))
+    df['Price_bin'] = pd.cut(df['Price'], bins=[i * 2.5 for i in range(33)])
+
+    with col1:
+        st.bar_chart(df['Distance_bin'].value_counts().sort_index())
+
+    with col2:
+        st.bar_chart(df['Duration_bin'].value_counts().sort_index())
+
+    with col3:
+        st.bar_chart(df['Price_bin'].value_counts().sort_index())
+
     # Add two histograms: Price per day of the week and Price per hour of the day
     # Extract day of the week and hour of the day from the Timestamp
     df['Hour_of_day'] = df['Timestamp'].dt.hour
