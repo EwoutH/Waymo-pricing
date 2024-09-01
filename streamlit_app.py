@@ -97,7 +97,7 @@ def main():
     st.write(f"Predicted price for {city_input}: \\${city_prediction:.2f}")
 
     # Histograms for Travel Distance, Travel Time, and Price
-    st.subheader("Travel Distance, Travel Time, and Price Distributions")
+    st.subheader("Travel distance, travel time, and price histograms")
 
     col1, col2, col3 = st.columns(3)
 
