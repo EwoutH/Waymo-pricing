@@ -102,9 +102,9 @@ def main():
     col1, col2, col3 = st.columns(3)
 
     # Binning the data and converting to string for better label display
-    distances = df['Distance'].sort_values().value_counts(bins=range(0, 21, 1), sort=False).to_frame()
-    durations = df['Duration_minutes'].sort_values().value_counts(bins=range(0, 95, 5), sort=False).to_frame()
-    prices = df['Price'].sort_values().value_counts(bins=range(0, 50, 2), sort=False).to_frame()
+    distances = df['Distance'].sort_values().value_counts(bins=range(0, 19, 1), sort=False).to_frame()
+    durations = df['Duration_minutes'].sort_values().value_counts(bins=range(0, 65, 5), sort=False).to_frame()
+    prices = df['Price'].sort_values().value_counts(bins=range(0, 42, 2), sort=False).to_frame()
 
     distances.index = [f"{int(i.left):02d}-{int(i.right):02d}" for i in distances.index]
     durations.index = [f"{int(i.left):02d}-{int(i.right):02d}" for i in durations.index]
