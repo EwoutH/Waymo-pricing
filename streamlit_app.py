@@ -102,18 +102,22 @@ def main():
     col1, col2, col3 = st.columns(3)
 
     # Binning the data and converting to string for better label display
-    df['Distance_bin'] = pd.cut(df['Distance'], bins=range(0, 26, 1)).astype(str)
-    df['Duration_bin'] = pd.cut(df['Duration_minutes'], bins=range(0, 95, 5)).astype(str)
-    df['Price_bin'] = pd.cut(df['Price'], bins=[i * 2.5 for i in range(33)]).astype(str)
+    distances = df['Distance'].sort_values().value_counts(bins=range(0, 21, 1), sort=False).to_frame()
+    durations = df['Duration_minutes'].sort_values().value_counts(bins=range(0, 95, 5), sort=False).to_frame()
+    prices = df['Price'].sort_values().value_counts(bins=range(0, 50, 2), sort=False).to_frame()
+
+    distances.index = [f"{int(i.left):02d}-{int(i.right):02d}" for i in distances.index]
+    durations.index = [f"{int(i.left):02d}-{int(i.right):02d}" for i in durations.index]
+    prices.index = [f"$ {int(i.left):02d}-{int(i.right):02d}" for i in prices.index]
 
     with col1:
-        st.bar_chart(df['Distance_bin'].value_counts().sort_index(), x_label='Distance (miles)')
+        st.bar_chart(distances, x_label='Distance (miles)')
 
     with col2:
-        st.bar_chart(df['Duration_bin'].value_counts().sort_index(), x_label='Duration (minutes)')
+        st.bar_chart(durations, x_label='Duration (minutes)')
 
     with col3:
-        st.bar_chart(df['Price_bin'].value_counts().sort_index(), x_label='Price ($)')
+        st.bar_chart(prices, x_label='Price ($)')
 
     # Add two histograms: Price per day of the week and Price per hour of the day
     # Extract day of the week and hour of the day from the Timestamp
@@ -121,7 +125,6 @@ def main():
 
     days_order = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
     df['Day of week'] = pd.Categorical(df['Day of week'], categories=days_order, ordered=True)
-    print(df['Day of week'].value_counts())
 
     st.subheader("Price distributions")
     st.markdown("_Note that these might be skewed by people taking shorter or longer rides at different times._")
