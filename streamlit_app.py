@@ -104,7 +104,7 @@ def main():
     df['Day of week'] = pd.Categorical(df['Day of week'], categories=days_order, ordered=True)
     print(df['Day of week'].value_counts())
 
-    st.subheader("Price Distribution")
+    st.subheader("Price distributions")
     st.markdown("_Note that these might be skewed by people taking shorter or longer rides at different times._")
     col1, col2 = st.columns(2)
 
@@ -118,6 +118,38 @@ def main():
         # Price per day part
         df['DayPart'] = pd.cut(df['Hour_of_day'], bins=[0, 7, 10, 16, 19, 24], labels=['Night (0-7)', 'Morning (7-10)', 'Day (10-16)', 'Evening (16-19)', 'Night (19-24)'])
         st.bar_chart(df.groupby('DayPart')['Price'].mean())
+
+    # Price per mile distribution
+    df['Price_per_mile'] = df['Price'] / df['Distance']
+
+    st.subheader("Price per mile distributions")
+    col1, col2 = st.columns(2)
+
+    with col1:
+        st.bar_chart(df.groupby('Day of week')['Price_per_mile'].mean().sort_index())
+        # Price per mile by area
+        st.bar_chart(df.groupby('Area')['Price_per_mile'].mean())
+
+    with col2:
+        st.bar_chart(df.groupby('Hour_of_day')['Price_per_mile'].mean())
+        # Price per mile by day part
+        st.bar_chart(df.groupby('DayPart')['Price_per_mile'].mean())
+
+    # Price per minute distribution
+    df['Price_per_minute'] = df['Price'] / df['Duration_minutes']
+
+    st.subheader("Price per minute distributions")
+    col1, col2 = st.columns(2)
+
+    with col1:
+        st.bar_chart(df.groupby('Day of week')['Price_per_minute'].mean().sort_index())
+        # Price per minute by area
+        st.bar_chart(df.groupby('Area')['Price_per_minute'].mean())
+
+    with col2:
+        st.bar_chart(df.groupby('Hour_of_day')['Price_per_minute'].mean())
+        # Price per minute by day part
+        st.bar_chart(df.groupby('DayPart')['Price_per_minute'].mean())
 
 
 if __name__ == "__main__":
