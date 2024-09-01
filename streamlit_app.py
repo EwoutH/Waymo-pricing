@@ -6,6 +6,7 @@ import pandas as pd
 def main():
     # Function to connect to a public Google Sheet by URL
     sheet_url = "https://docs.google.com/spreadsheets/d/1lYhQeVP-9Ts_cSKiWYnQi_YDb_HEUF8VsXvgmdnDjEY/export?format=csv"
+    # sheet_url = "https://docs.google.com/spreadsheets/d/1lYhQeVP-9Ts_cSKiWYnQi_YDb_HEUF8VsXvgmdnDjEY/export?format=csv&gid=1730452293"
 
     # Define the data types for each column (excluding Duration for now)
     dtype_dict = {
@@ -23,6 +24,12 @@ def main():
 
     # Create a column with the duration in minutes
     df['Duration_minutes'] = df['Duration'].dt.total_seconds() / 60
+
+    # Remove outliers
+    df = df[df['Price'] > 3]
+    df = df[df['Price'] < 80]
+    df = df[df['Distance'] < 25]
+    df = df[df['Duration_minutes'] < 90]
 
     # Perform multiple linear regression
     X1 = df[['Distance', 'Duration_minutes']]
