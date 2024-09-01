@@ -96,5 +96,29 @@ def main():
     st.write(f"Predicted general price: \\${gen_prediction:.2f}")
     st.write(f"Predicted price for {city_input}: \\${city_prediction:.2f}")
 
+    # Add two histograms: Price per day of the week and Price per hour of the day
+    # Extract day of the week and hour of the day from the Timestamp
+    df['Hour_of_day'] = df['Timestamp'].dt.hour
+
+    days_order = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+    df['Day of week'] = pd.Categorical(df['Day of week'], categories=days_order, ordered=True)
+    print(df['Day of week'].value_counts())
+
+    st.subheader("Price Distribution")
+    st.markdown("_Note that these might be skewed by people taking shorter or longer rides at different times._")
+    col1, col2 = st.columns(2)
+
+    with col1:
+        st.bar_chart(df.groupby('Day of week')['Price'].mean().sort_index())
+        # Price per area
+        st.bar_chart(df.groupby('Area')['Price'].mean())
+
+    with col2:
+        st.bar_chart(df.groupby('Hour_of_day')['Price'].mean())
+        # Price per day part
+        df['DayPart'] = pd.cut(df['Hour_of_day'], bins=[0, 7, 10, 16, 19, 24], labels=['Night (0-7)', 'Morning (7-10)', 'Day (10-16)', 'Evening (16-19)', 'Night (19-24)'])
+        st.bar_chart(df.groupby('DayPart')['Price'].mean())
+
+
 if __name__ == "__main__":
     main()
