@@ -17,7 +17,7 @@ def main():
     # Read the CSV into a DataFrame with specified data types
     raw_df = pd.read_csv(sheet_url, dtype=dtype_dict, parse_dates=["Timestamp"])
     df = raw_df.copy()
-    raw_df = raw_df.drop(columns=["Timestamp", "Price expectation", "Surge pricing", "Comment (optional)"])
+    raw_df = raw_df.drop(columns=["Timestamp", "Waiting time", "Price expectation", "Surge pricing", "Comment (optional)"])
 
     # Convert the Duration column to timedelta
     df['Duration'] = pd.to_timedelta(df['Duration'])
