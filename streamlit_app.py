@@ -16,6 +16,11 @@ def main():
 
     # Read the CSV into a DataFrame with specified data types
     raw_df = pd.read_csv(sheet_url, dtype=dtype_dict, parse_dates=["Timestamp"])
+    raw_df = raw_df.rename(columns={
+        "Did you find the price for this ride...": "Price opinion",
+        "Do you think there was surge pricing?": "Surge pricing",
+        "Nickname (optional)": "Nickname"
+    })
     df = raw_df.copy()
     raw_df = raw_df.drop(columns=["Timestamp", "Waiting time", "Price expectation", "Surge pricing", "Comment (optional)"], errors="ignore")
 
